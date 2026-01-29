@@ -1,0 +1,24 @@
+name: flutter_survey_engine
+description: A modular SurveyJS-like engine and renderer for Flutter (demo).
+publish_to: "none"
+version: 0.0.1
+environment:
+  sdk: ">=2.18.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_js: ^0.8.5
+  shamsi_date: ^1.1.1
+  intl: ^0.20.2
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  generate: true
