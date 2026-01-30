@@ -3,26 +3,31 @@ import 'package:flutter_survey_engine/extenssion/jalali_extenstions.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 import '../../common/jalali_date_picker_dialog.dart';
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-/// Survey widget for Jalali date picker with border
-class PersianDatePickerWidget extends StatelessWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const PersianDatePickerWidget(
-      {Key? key, required this.el, required this.engine})
-      : super(key: key);
+class PersianDatePickerWidget extends ReactiveSurveyWidget {
+  const PersianDatePickerWidget({
+    super.key,
+    required super.el,
+    required super.engine,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    final val = engine.getValue(el.name) as String?;
-    final ro = engine.isReadOnly(el);
+  State<PersianDatePickerWidget> createState() =>
+      _PersianDatePickerWidgetState();
+}
 
-    // Display string
+class _PersianDatePickerWidgetState
+    extends ReactiveSurveyWidgetState<PersianDatePickerWidget> {
+  @override
+  Widget buildContent(BuildContext context) {
+    final ro = isReadOnly;
+
+    // Current value
+    final val = value as String?;
     String display = 'تاریخ را انتخاب کنید';
     Jalali? selectedJalali;
+
     if (val != null && val.isNotEmpty) {
       try {
         final dt = DateTime.parse(val);
@@ -31,16 +36,12 @@ class PersianDatePickerWidget extends StatelessWidget {
       } catch (_) {}
     }
 
-    if (el.visible == false) {
-      return const SizedBox.shrink();
-    }
-
     return Container(
-      margin: EdgeInsets.only(top: 16),
+      margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey), // Border color
-        borderRadius: BorderRadius.circular(8), // Rounded corners
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
@@ -56,8 +57,7 @@ class PersianDatePickerWidget extends StatelessWidget {
                 );
 
                 if (picked != null) {
-                  engine.setValue(
-                      el.name, picked.toDateTime().toIso8601String());
+                  setValue(picked.toDateTime().toIso8601String());
                 }
               },
       ),

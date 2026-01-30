@@ -1,48 +1,55 @@
 import 'package:flutter/material.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class TextInputWidget extends StatefulWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const TextInputWidget({Key? key, required this.el, required this.engine})
-      : super(key: key);
+class TextInputWidget extends ReactiveSurveyWidget {
+  const TextInputWidget({super.key, required super.el, required super.engine});
 
   @override
   State<TextInputWidget> createState() => _TextInputWidgetState();
 }
 
-class _TextInputWidgetState extends State<TextInputWidget> {
-  late TextEditingController ctrl;
+class _TextInputWidgetState extends ReactiveSurveyWidgetState<TextInputWidget> {
+  TextEditingController? ctrl;
 
   @override
   void initState() {
     super.initState();
-    ctrl = TextEditingController(
-        text: widget.engine.getValue(widget.el.name)?.toString());
+
+    // Initialize controller
+    ctrl = TextEditingController(text: value?.toString() ?? '');
   }
 
   @override
-  Widget build(BuildContext context) {
-    final ro = widget.engine.isReadOnly(widget.el);
+  void dispose() {
+    ctrl?.dispose();
+    super.dispose();
+  }
 
-    if (widget.el.visible == false) {
-      return const SizedBox.shrink();
+  @override
+  void onEngineUpdate() {
+    // Only update if controller is initialized
+    if (ctrl == null) return;
+
+    final newValue = value?.toString() ?? '';
+    if (ctrl!.text != newValue) {
+      ctrl!.text = newValue;
     }
+  }
 
+  @override
+  Widget buildContent(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        TextField(
-          controller: ctrl,
-          decoration:
-              InputDecoration(errorText: widget.engine.errors[widget.el.name]),
-          readOnly: ro,
-          onChanged: (v) => widget.engine.setValue(widget.el.name, v),
+      child: TextField(
+        controller: ctrl,
+        readOnly: isReadOnly,
+        decoration: InputDecoration(
+          errorText: error,
+          border: const OutlineInputBorder(),
         ),
-      ]),
+        onChanged: setValue,
+      ),
     );
   }
 }

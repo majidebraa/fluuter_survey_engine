@@ -29,17 +29,10 @@ class _PanelCardState extends State<PanelCard> {
         children: [
           // 🔹 HEADER
           InkWell(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(12),
-            ),
-            onTap: () {
-              setState(() => _collapsed = !_collapsed);
-            },
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            onTap: () => setState(() => _collapsed = !_collapsed),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               child: Row(
                 children: [
                   Expanded(
@@ -70,7 +63,12 @@ class _PanelCardState extends State<PanelCard> {
             firstChild: const SizedBox.shrink(),
             secondChild: Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-              child: Column(children: widget.children),
+              child: Column(
+                children: widget.children.map((child) {
+                  // Wrap each child to force rebuild even if hidden
+                  return Builder(builder: (_) => child);
+                }).toList(),
+              ),
             ),
           ),
         ],

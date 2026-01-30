@@ -1,44 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class DatePickerWidget extends StatelessWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const DatePickerWidget({Key? key, required this.el, required this.engine})
-      : super(key: key);
+class DatePickerWidget extends ReactiveSurveyWidget {
+  const DatePickerWidget({super.key, required super.el, required super.engine});
 
   @override
-  Widget build(BuildContext context) {
-    final val = engine.getValue(el.name) as String?;
-    final ro = engine.isReadOnly(el);
-    String display = val ?? 'Select date';
+  State<DatePickerWidget> createState() => _DatePickerWidgetState();
+}
+
+class _DatePickerWidgetState
+    extends ReactiveSurveyWidgetState<DatePickerWidget> {
+  @override
+  void onEngineUpdate() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
+    final val = value as String?;
+    final ro = isReadOnly;
+
+    // Default display
+    String display = 'Select date';
     try {
       if (val != null && val.isNotEmpty) {
         final dt = DateTime.parse(val);
         final j = Jalali.fromDateTime(dt.toLocal());
-        display = '${j /*.formatCompactDate()*/}';
+        display = '${j.year}/${j.month}/${j.day}';
       }
     } catch (_) {}
-    if (el.visible == false) {
+
+    if (!isVisible) {
       return const SizedBox.shrink();
     }
+
     return ListTile(
       subtitle: Text(display),
       onTap: ro
           ? null
           : () async {
-              final now = DateTime.now();
+              final now = val != null && val.isNotEmpty
+                  ? DateTime.parse(val)
+                  : DateTime.now();
+
               final picked = await showDatePicker(
-                  context: context,
-                  initialDate: now,
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime(2100));
-              if (picked != null)
-                engine.setValue(el.name, picked.toIso8601String());
+                context: context,
+                initialDate: now,
+                firstDate: DateTime(1900),
+                lastDate: DateTime(2100),
+              );
+
+              if (picked != null) setValue(picked.toIso8601String());
             },
     );
   }

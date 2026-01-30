@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class TimePicker extends StatelessWidget {
-  final SurveyEngine engine;
-  final FormElement el;
+class TimePickerWidget extends ReactiveSurveyWidget {
+  const TimePickerWidget({super.key, required super.el, required super.engine});
 
-  const TimePicker({
-    super.key,
-    required this.engine,
-    required this.el,
-  });
+  @override
+  State<TimePickerWidget> createState() => _TimePickerWidgetState();
+}
 
+class _TimePickerWidgetState
+    extends ReactiveSurveyWidgetState<TimePickerWidget> {
   Future<void> _pickTime(BuildContext context, TimeOfDay? initialTime) async {
     final picked = await showTimePicker(
       context: context,
@@ -22,72 +20,54 @@ class TimePicker extends StatelessWidget {
 
     if (picked != null) {
       final formatted = _formatTime(picked);
-      engine.setValue(el.name, formatted);
+      setValue(formatted);
     }
   }
 
   String _formatTime(TimeOfDay time) {
     final now = DateTime.now();
     final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    return DateFormat.Hm().format(dt); // 24-hour format
+    return DateFormat.Hm().format(dt); // 24-hour 24:00 format
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: engine,
-      builder: (context, _) {
-        final isVisible = engine.isVisible(el);
-        if (!isVisible) return const SizedBox.shrink();
+  Widget buildContent(BuildContext context) {
+    final valueStr = value?.toString() ?? '--:--';
+    final readOnly = isReadOnly;
 
-        final value = engine.getValue(el.name);
-        final displayText = value ?? '--:--';
-
-        if (el.visible == false) {
-          return const SizedBox.shrink();
+    // Parse TimeOfDay for initial picker
+    TimeOfDay? initial;
+    if (value != null && value is String && value.isNotEmpty) {
+      final parts = value.split(':');
+      if (parts.length == 2) {
+        final h = int.tryParse(parts[0]);
+        final m = int.tryParse(parts[1]);
+        if (h != null && m != null) {
+          initial = TimeOfDay(hour: h, minute: m);
         }
+      }
+    }
 
-        return GestureDetector(
-          onTap: engine.isReadOnly(el)
-              ? null
-              : () {
-                  TimeOfDay? initial;
-                  if (value != null && value is String && value.isNotEmpty) {
-                    final parts = value.split(':');
-                    if (parts.length == 2) {
-                      final h = int.tryParse(parts[0]);
-                      final m = int.tryParse(parts[1]);
-                      if (h != null && m != null) {
-                        initial = TimeOfDay(hour: h, minute: m);
-                      }
-                    }
-                  }
-                  _pickTime(context, initial);
-                },
-          child: Container(
-            margin: const EdgeInsets.only(top: 16),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade400),
-              borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: readOnly ? null : () => _pickTime(context, initial),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              valueStr,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  displayText,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.access_time, color: Colors.grey),
-              ],
-            ),
-          ),
-        );
-      },
+            const Icon(Icons.access_time, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 }

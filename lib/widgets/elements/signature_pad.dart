@@ -1,36 +1,41 @@
 import 'package:flutter/material.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class SignaturePadWidget extends StatelessWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const SignaturePadWidget({Key? key, required this.el, required this.engine})
-      : super(key: key);
+class SignaturePadWidget extends ReactiveSurveyWidget {
+  const SignaturePadWidget(
+      {super.key, required super.el, required super.engine});
 
   @override
-  Widget build(BuildContext context) {
-    final ro = engine.isReadOnly(el);
+  State<SignaturePadWidget> createState() => _SignaturePadWidgetState();
+}
 
-    if (el.visible == false) {
-      return const SizedBox.shrink();
-    }
+class _SignaturePadWidgetState
+    extends ReactiveSurveyWidgetState<SignaturePadWidget> {
+  void _sign() {
+    final value = 'signed:${DateTime.now().toIso8601String()}';
+    setValue(value);
+  }
 
-    return Column(children: [
-      Container(
+  @override
+  Widget buildContent(BuildContext context) {
+    final readOnly = isReadOnly;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
           height: 120,
           color: Colors.grey.shade200,
-          child: const Center(child: Text('Signature area (placeholder)'))),
-      ElevatedButton(
-          onPressed: ro
-              ? null
-              : () {
-                  engine.setValue(
-                      el.name, 'signed:${DateTime.now().toIso8601String()}');
-                },
-          child: const Text('Sign'))
-    ]);
+          alignment: Alignment.center,
+          child: const Text('Signature area (placeholder)'),
+        ),
+        const SizedBox(height: 8),
+        ElevatedButton(
+          onPressed: readOnly ? null : _sign,
+          child: const Text('Sign'),
+        ),
+      ],
+    );
   }
 }

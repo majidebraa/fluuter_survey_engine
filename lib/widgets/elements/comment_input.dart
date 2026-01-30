@@ -1,49 +1,61 @@
 import 'package:flutter/material.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class CommentInputWidget extends StatefulWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const CommentInputWidget({Key? key, required this.el, required this.engine})
-      : super(key: key);
+class CommentInputWidget extends ReactiveSurveyWidget {
+  const CommentInputWidget(
+      {super.key, required super.el, required super.engine});
 
   @override
   State<CommentInputWidget> createState() => _CommentInputWidgetState();
 }
 
-class _CommentInputWidgetState extends State<CommentInputWidget> {
+class _CommentInputWidgetState
+    extends ReactiveSurveyWidgetState<CommentInputWidget> {
   late TextEditingController ctrl;
 
   @override
   void initState() {
     super.initState();
-    ctrl = TextEditingController(
-        text: widget.engine.getValue(widget.el.name)?.toString());
+    ctrl = TextEditingController(text: value?.toString() ?? '');
   }
 
   @override
-  Widget build(BuildContext context) {
-    final ro = widget.engine.isReadOnly(widget.el);
-
-    if (widget.el.visible == false) {
-      return const SizedBox.shrink();
+  void onEngineUpdate() {
+    // Update controller if value changed externally
+    final newValue = value?.toString() ?? '';
+    if (ctrl.text != newValue) {
+      ctrl.text = newValue;
     }
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
+    if (!isVisible) return const SizedBox.shrink();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        TextField(
-          controller: ctrl,
-          maxLines: 4,
-          readOnly: ro,
-          decoration:
-              InputDecoration(errorText: widget.engine.errors[widget.el.name]),
-          onChanged: (v) => widget.engine.setValue(widget.el.name, v),
-        ),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.el.title != null)
+            Text(
+              widget.el.title!,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          const SizedBox(height: 4),
+          TextField(
+            controller: ctrl,
+            maxLines: 4,
+            readOnly: isReadOnly,
+            decoration: InputDecoration(
+              errorText: error,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: setValue,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -26,18 +26,9 @@ class SurveyEngine with ChangeNotifier {
   void setInitial(Map<String, dynamic>? initial) {
     if (initial == null) return;
 
-    bool changed = false;
-    initial.forEach((key, value) {
-      if (values[key] != value) {
-        values[key] = value;
-        changed = true;
-      }
-    });
-
-    if (changed) {
-      _evaluateCalculatedValues();
-      notifyListeners();
-    }
+    values.addAll(initial);
+    evaluateAllExpressions();
+    notifyListeners();
   }
 
   dynamic getValue(String key) => values[key];
@@ -46,14 +37,12 @@ class SurveyEngine with ChangeNotifier {
 
   Future<void> setValue(String key, dynamic value) async {
     final old = values[key];
-    if (old == value) return; // ⛔ prevents infinite loop
+    if (old == value) return;
 
     values[key] = value;
-
     onValueChanged?.call(key, value);
 
-    await _evaluateCalculatedValues();
-
+    await evaluateAllExpressions();
     notifyListeners();
   }
 
@@ -71,7 +60,7 @@ class SurveyEngine with ChangeNotifier {
 
     final res = evaluator.evaluate(el.visibleIf!, values) == true;
 
-    //  Clear value if invisible
+    // Clear value if invisible
     if (!res && el.clearIfInvisible != 'none') {
       values.remove(el.name);
     }
@@ -79,29 +68,83 @@ class SurveyEngine with ChangeNotifier {
     return res;
   }
 
-  // ---------------- CALCULATED VALUES ----------------
+  // ---------------- CALCULATED EXPRESSIONS ----------------
 
-  Future<void> _evaluateCalculatedValues() async {
+  /// Evaluate all calculated values and expressions for all elements
+  Future<void> evaluateAllExpressions() async {
     bool changed = false;
 
     for (final page in schema.pages) {
       for (final el in page.elements) {
-        if (el.calculatedValue == null || el.calculatedValue!.trim().isEmpty)
-          continue;
+        // 1️⃣ Evaluate expression
+        if (el.expression != null && el.expression!.trim().isNotEmpty) {
+          final expr = el.expression!;
+          String s = expr.replaceAllMapped(RegExp(r'\{([^}]+)\}'), (m) {
+            final key = m[1]!;
+            final value = values[key];
+            return value != null ? value.toString() : '';
+          });
 
-        final newVal = evaluator.evaluate(el.calculatedValue!, values);
+          // Handle simple concatenation using '+'
+          final parts = s.split('+').map((p) => p.trim()).toList();
+          final result = parts.join();
 
-        final oldVal = values[el.name];
+          if (values[el.name]?.toString() != result) {
+            values[el.name] = result;
+            changed = true;
+          }
+        }
 
-        if (newVal != oldVal) {
-          values[el.name] = newVal;
-          changed = true;
+        // 2️⃣ Evaluate calculatedValue
+        if (el.calculatedValue != null &&
+            el.calculatedValue!.trim().isNotEmpty) {
+          final newVal = evaluator.evaluate(el.calculatedValue!, values);
+          if (values[el.name] != newVal) {
+            values[el.name] = newVal;
+            changed = true;
+          }
+        }
+
+        // 3️⃣ Recursively evaluate child elements for panels
+        if (el.type == 'panel' && el.elements != null) {
+          for (final child in el.elements!) {
+            await _evaluateElementExpressions(child);
+          }
         }
       }
     }
 
-    if (changed) {
-      notifyListeners();
+    if (changed) notifyListeners();
+  }
+
+  Future<void> _evaluateElementExpressions(FormElement el) async {
+    if (el.expression != null && el.expression!.trim().isNotEmpty) {
+      final expr = el.expression!;
+      String s = expr.replaceAllMapped(RegExp(r'\{([^}]+)\}'), (m) {
+        final key = m[1]!;
+        final value = values[key];
+        return value != null ? value.toString() : '';
+      });
+
+      final parts = s.split('+').map((p) => p.trim()).toList();
+      final result = parts.join();
+
+      if (values[el.name]?.toString() != result) {
+        values[el.name] = result;
+      }
+    }
+
+    if (el.calculatedValue != null && el.calculatedValue!.trim().isNotEmpty) {
+      final newVal = evaluator.evaluate(el.calculatedValue!, values);
+      if (values[el.name] != newVal) {
+        values[el.name] = newVal;
+      }
+    }
+
+    if (el.type == 'panel' && el.elements != null) {
+      for (final child in el.elements!) {
+        await _evaluateElementExpressions(child);
+      }
     }
   }
 

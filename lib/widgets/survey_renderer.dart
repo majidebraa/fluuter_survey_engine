@@ -41,6 +41,7 @@ class _SurveyRendererState extends State<SurveyRenderer> {
   @override
   void initState() {
     super.initState();
+
     widget.engine.setInitial(widget.dto.formData);
     widget.engine.globalReadOnly = widget.dto.readOnly;
 
@@ -69,8 +70,8 @@ class _SurveyRendererState extends State<SurveyRenderer> {
                         Text(page.name,
                             style: Theme.of(context).textTheme.titleLarge),
                         const SizedBox(height: 8),
-                        for (final el in page.elements)
-                          if (widget.engine.isVisible(el)) _buildElement(el),
+                        for (final el in page.elements) _buildElement(el),
+                        // ✅ build all, let widget handle visibility
                       ],
                     ),
                   ),
@@ -95,7 +96,6 @@ class _SurveyRendererState extends State<SurveyRenderer> {
               const SnackBar(content: Text('Submitted')),
             );
           } else {
-            print("${widget.engine.values}");
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Please fill required fields')),
             );
@@ -107,11 +107,6 @@ class _SurveyRendererState extends State<SurveyRenderer> {
   }
 
   Widget _buildElement(FormElement el, {int level = 0}) {
-    // 🔥 visibility check (important)
-    if (!widget.engine.isVisible(el)) {
-      return const SizedBox.shrink();
-    }
-
     // 🔹 PANEL (recursive)
     if (el.type == 'panel') {
       return PanelCard(
@@ -128,7 +123,7 @@ class _SurveyRendererState extends State<SurveyRenderer> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.engine.isVisible(el) && el.title != null)
+          if (el.title != null && widget.engine.isVisible(el))
             QuestionTitle(
               title: el.title ?? "",
               isRequired: el.isRequired ?? false,
@@ -164,7 +159,7 @@ class _SurveyRendererState extends State<SurveyRenderer> {
       case 'date-picker':
         {
           if (el.dateAndTime != null && el.dateAndTime == "time") {
-            return TimePicker(el: el, engine: widget.engine);
+            return TimePickerWidget(el: el, engine: widget.engine);
           }
           return PersianDatePickerWidget(el: el, engine: widget.engine);
         }
@@ -177,6 +172,7 @@ class _SurveyRendererState extends State<SurveyRenderer> {
 
       case 'signaturepad':
         return SignaturePadWidget(el: el, engine: widget.engine);
+
       case 'expression':
         return Expression(el: el, engine: widget.engine);
 

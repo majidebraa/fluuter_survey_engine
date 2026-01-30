@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class BooleanToggleWidget extends StatelessWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const BooleanToggleWidget({Key? key, required this.el, required this.engine})
-      : super(key: key);
+class BooleanToggleWidget extends ReactiveSurveyWidget {
+  const BooleanToggleWidget(
+      {super.key, required super.el, required super.engine});
 
   @override
-  Widget build(BuildContext context) {
-    final current = engine.getValue(el.name) as bool? ?? false;
-    final ro = engine.isReadOnly(el);
+  State<BooleanToggleWidget> createState() => _BooleanToggleWidgetState();
+}
 
-    if (el.visible == false) {
-      return const SizedBox.shrink();
-    }
+class _BooleanToggleWidgetState
+    extends ReactiveSurveyWidgetState<BooleanToggleWidget> {
+  @override
+  void onEngineUpdate() {
+    if (mounted) setState(() {}); // rebuild when engine updates
+  }
+
+  @override
+  Widget buildContent(BuildContext context) {
+    if (!isVisible) return const SizedBox.shrink();
+
+    final current = (value as bool?) ?? false;
+
     return SwitchListTile(
-      //title: Text(el.title ?? el.name),
+      title: Text(widget.el.title ?? widget.el.name),
       value: current,
-      onChanged: ro ? null : (v) => engine.setValue(el.name, v),
+      onChanged: isReadOnly ? null : setValue,
     );
   }
 }

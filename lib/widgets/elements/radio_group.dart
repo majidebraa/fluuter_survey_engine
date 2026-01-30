@@ -1,50 +1,42 @@
 import 'package:flutter/material.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class RadioGroupWidget extends StatelessWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const RadioGroupWidget({
-    Key? key,
-    required this.el,
-    required this.engine,
-  }) : super(key: key);
+class RadioGroupWidget extends ReactiveSurveyWidget {
+  const RadioGroupWidget({super.key, required super.el, required super.engine});
 
   @override
-  Widget build(BuildContext context) {
-    final choices = el.choices ?? [];
-    final current = engine.getValue(el.name);
-    final ro = engine.isReadOnly(el);
+  State<RadioGroupWidget> createState() => _RadioGroupWidgetState();
+}
 
-    if (el.visible == false) {
-      return const SizedBox.shrink();
-    }
+class _RadioGroupWidgetState
+    extends ReactiveSurveyWidgetState<RadioGroupWidget> {
+  @override
+  Widget buildContent(BuildContext context) {
+    final choices = widget.el.choices ?? [];
+    final current = value; // from ReactiveSurveyWidgetState
+    final readOnly = isReadOnly;
 
-    return RadioGroup<dynamic>(
-      groupValue: current,
-      onChanged: (value) {
-        if (ro) return; // block changes when read-only
-        engine.setValue(el.name, value);
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...choices.map(
-            (c) => RadioListTile<dynamic>(
-              value: c,
-              title: Text(c.toString()),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ...choices.map(
+          (choice) => RadioListTile<dynamic>(
+            value: choice,
+            groupValue: current,
+            title: Text(choice.toString()),
+            onChanged: readOnly ? null : (v) => setValue(v),
           ),
-          if (engine.errors[el.name] != null)
-            Text(
-              engine.errors[el.name]!,
+        ),
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, top: 4.0),
+            child: Text(
+              error!,
               style: const TextStyle(color: Colors.red),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

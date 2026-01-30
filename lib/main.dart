@@ -138,6 +138,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "name": "vendoer",
                     "title": "آیتم2",
                     "questionId": "3f9a8713-4c11-48e3-b115-d52ac16090d6",
+                    "visibleIf": "{BUS_NUMBER} > 5",
                   },
                   {
                     "type": "text",
@@ -363,7 +364,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   "type": "ENGINE_VARIABLE",
                 },
                 "expression": "\"test_\"+{RESPONSIBLE_NUMBER}",
-                "visibleIf": "{BUS_NUMBER} > 2",
+                "visibleIf": "{BUS_NUMBER} < 3",
               },
               {
                 "type": "expression",

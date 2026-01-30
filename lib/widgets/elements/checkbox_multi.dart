@@ -1,46 +1,54 @@
 import 'package:flutter/material.dart';
 
-import '../../engine/survey_engine.dart';
-import '../../models/form_models.dart';
+import '../base_reactive_widget.dart';
 
-class CheckboxMultiWidget extends StatelessWidget {
-  final FormElement el;
-  final SurveyEngine engine;
-
-  const CheckboxMultiWidget({Key? key, required this.el, required this.engine})
-      : super(key: key);
+class CheckboxMultiWidget extends ReactiveSurveyWidget {
+  const CheckboxMultiWidget(
+      {super.key, required super.el, required super.engine});
 
   @override
-  Widget build(BuildContext context) {
-    final choices = el.choices ?? [];
-    final current = (engine.getValue(el.name) as List<dynamic>?) ?? [];
-    final ro = engine.isReadOnly(el);
+  State<CheckboxMultiWidget> createState() => _CheckboxMultiWidgetState();
+}
 
-    if (el.visible == false) {
-      return const SizedBox.shrink();
-    }
+class _CheckboxMultiWidgetState
+    extends ReactiveSurveyWidgetState<CheckboxMultiWidget> {
+  @override
+  void onEngineUpdate() {
+    // No extra state needed, just rebuild
+    if (mounted) setState(() {});
+  }
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      ...choices.map((c) {
-        final checked = current.contains(c);
-        return CheckboxListTile(
-          title: Text(c.toString()),
-          value: checked,
-          onChanged: ro
-              ? null
-              : (v) {
-                  final list = List<dynamic>.from(current);
-                  if (v == true)
-                    list.add(c);
-                  else
-                    list.remove(c);
-                  engine.setValue(el.name, list);
-                },
-        );
-      }).toList(),
-      if (engine.errors[el.name] != null)
-        Text(engine.errors[el.name]!,
-            style: const TextStyle(color: Colors.red)),
-    ]);
+  @override
+  Widget buildContent(BuildContext context) {
+    if (!isVisible) return const SizedBox.shrink();
+
+    final choices = widget.el.choices ?? [];
+    final current = (value as List<dynamic>?) ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final c in choices)
+          CheckboxListTile(
+            title: Text(c.toString()),
+            value: current.contains(c),
+            onChanged: isReadOnly
+                ? null
+                : (v) {
+                    final list = List<dynamic>.from(current);
+                    if (v == true)
+                      list.add(c);
+                    else
+                      list.remove(c);
+                    setValue(list);
+                  },
+          ),
+        if (error != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            child: Text(error!, style: const TextStyle(color: Colors.red)),
+          ),
+      ],
+    );
   }
 }
