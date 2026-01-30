@@ -19,7 +19,7 @@ class SurveyEngine with ChangeNotifier {
   ValidationCallback? onValidation;
 
   SurveyEngine(this.schema, {ExpressionEvaluator? evaluator})
-      : evaluator = evaluator ?? DartSafeEvaluator();
+      : evaluator = evaluator ?? DartExpressionEvaluator();
 
   // ---------------- INITIAL VALUES ----------------
 

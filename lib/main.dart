@@ -363,6 +363,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   "type": "ENGINE_VARIABLE",
                 },
                 "expression": "\"test_\"+{RESPONSIBLE_NUMBER}",
+                "visibleIf": "{BUS_NUMBER} > 2",
               },
               {
                 "type": "expression",
@@ -407,7 +408,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
         "requester": "مجید ابراهیمی افارانی",
       },
     });
-    engine = SurveyEngine(dto.formSchema, evaluator: DartSafeEvaluator());
+    engine = SurveyEngine(dto.formSchema, evaluator: DartExpressionEvaluator());
     engine.setInitial(dto.formData);
     engine.onValidation = (errors) {
       // handle validation errors globally if needed
