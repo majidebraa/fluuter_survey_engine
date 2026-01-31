@@ -294,7 +294,15 @@ class _SurveyScreenState extends State<SurveyScreen> {
           }
         ],
         "outcomeType": [
-          "SUBMIT"
+          "SUBMIT",
+          "NO",
+          "ACCEPT",
+          "COMPLETED",
+          "OK",
+          "REJECT",
+          "APPROVE",
+          "DEFER",
+          "SendToExport"
         ]
       },
       "formData": {
@@ -334,9 +342,12 @@ class _SurveyScreenState extends State<SurveyScreen> {
       body: SurveyRenderer(
         dto: dto,
         engine: engine,
-        onSubmit: (values) {
-          debugPrint('Submitted: ' + jsonEncode(values));
-          debugPrint('Submitted: ' + jsonEncode(values));
+        onOutcome: (outcome, values) {
+          debugPrint('Outcome: $outcome');
+          debugPrint('Form Values: $values' );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Action: $outcome اجرا شد')),
+          );
         },
         onChange: (name, value) {
           debugPrint('Changed: $name = $value');

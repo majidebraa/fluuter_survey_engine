@@ -20,8 +20,14 @@ import 'elements/text_input.dart';
 class SurveyRenderer extends StatefulWidget {
   final TaskFormDataDto dto;
   final SurveyEngine engine;
-  final void Function(Map<String, dynamic>)? onSubmit;
+
+  /// Called whenever a field changes
   final void Function(String name, dynamic value)? onChange;
+
+  /// Called when user clicks an action button
+  /// Returns: outcomeType + current form values
+  final void Function(String outcomeType, Map<String, dynamic> data)? onOutcome;
+
   final TextDirection textDirection;
 
   const SurveyRenderer({
@@ -29,7 +35,7 @@ class SurveyRenderer extends StatefulWidget {
     required this.dto,
     required this.engine,
     this.onChange,
-    this.onSubmit,
+    this.onOutcome,
     this.textDirection = TextDirection.rtl,
   }) : super(key: key);
 
@@ -58,7 +64,9 @@ class _SurveyRendererState extends State<SurveyRenderer> {
         animation: widget.engine,
         builder: (context, _) {
           return ListView(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             children: [
+              // Render pages and their elements
               for (final page in widget.dto.formSchema.pages)
                 Card(
                   margin: const EdgeInsets.all(12),
@@ -71,12 +79,13 @@ class _SurveyRendererState extends State<SurveyRenderer> {
                             style: Theme.of(context).textTheme.titleLarge),
                         const SizedBox(height: 8),
                         for (final el in page.elements) _buildElement(el),
-                        // ✅ build all, let widget handle visibility
                       ],
                     ),
                   ),
                 ),
-              _submitButton(context),
+
+              // ✅ Render outcome/action buttons
+              _actionButtons(context),
             ],
           );
         },
@@ -84,30 +93,76 @@ class _SurveyRendererState extends State<SurveyRenderer> {
     );
   }
 
-  Widget _submitButton(BuildContext context) {
+  // ---------------- ACTION BUTTONS ----------------
+  Widget _actionButtons(BuildContext context) {
+    final outcomeList = widget.dto.formSchema.outcomeType;
+
+    if (outcomeList.isEmpty) return const SizedBox.shrink();
+
+    // Define icons for common outcomes (customize as needed)
+    final Map<String, IconData> outcomeIcons = {
+      'SUBMIT': Icons.send,
+      'NO': Icons.close,
+      'ACCEPT': Icons.check_circle,
+      'COMPLETED': Icons.done_all,
+      'OK': Icons.thumb_up,
+      'REJECT': Icons.cancel,
+      'APPROVE': Icons.check,
+      'DEFER': Icons.schedule,
+      'SendToExport': Icons.upload_file,
+    };
+
+    // Custom text mapping if you want to display different labels
+    final Map<String, String> outcomeTexts = {
+      'SUBMIT': 'ارسال',
+      'NO': 'نه',
+      'ACCEPT': 'پذیرش',
+      'COMPLETED': 'تکمیل',
+      'OK': 'تایید',
+      'REJECT': 'رد',
+      'APPROVE': 'موافقت',
+      'DEFER': 'به تعویق انداختن',
+      'SendToExport': 'ارسال به خروجی',
+    };
+
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: ElevatedButton(
-        onPressed: () async {
-          final ok = await widget.engine.trySubmit();
-          if (ok) {
-            widget.onSubmit?.call(widget.engine.values);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Submitted')),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please fill required fields')),
-            );
-          }
-        },
-        child: const Text('Submit'),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        alignment: WrapAlignment.center,
+        children: outcomeList.map((action) {
+          final icon = outcomeIcons[action] ?? Icons.check;
+          final text = outcomeTexts[action] ?? action;
+
+          return ElevatedButton.icon(
+            onPressed: () async {
+              final ok = await widget.engine.trySubmit();
+              if (!ok) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('لطفاً فیلدهای اجباری را تکمیل کنید')),
+                );
+                return;
+              }
+
+              // Return selected outcome + form data
+              widget.onOutcome?.call(action, widget.engine.values);
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('$text انجام شد')),
+              );
+            },
+            icon: Icon(icon),
+            label: Text(text),
+          );
+        }).toList(),
       ),
     );
   }
 
+  // ---------------- ELEMENT RENDERER ----------------
   Widget _buildElement(FormElement el, {int level = 0}) {
-    // 🔹 PANEL (recursive)
+    // Panel (recursive)
     if (el.type == 'panel') {
       return PanelCard(
         title: el.title ?? el.name,
@@ -117,7 +172,7 @@ class _SurveyRendererState extends State<SurveyRenderer> {
       );
     }
 
-    // 🔹 NORMAL QUESTION
+    // Normal question
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Column(
