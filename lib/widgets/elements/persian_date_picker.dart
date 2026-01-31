@@ -3,6 +3,7 @@ import 'package:flutter_survey_engine/extenssion/jalali_extenstions.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
 import '../../common/jalali_date_picker_dialog.dart';
+import '../../utils/date_time_converter.dart';
 import '../base_reactive_widget.dart';
 
 class PersianDatePickerWidget extends ReactiveSurveyWidget {
@@ -21,46 +22,48 @@ class _PersianDatePickerWidgetState
     extends ReactiveSurveyWidgetState<PersianDatePickerWidget> {
   @override
   Widget buildContent(BuildContext context) {
-    final ro = isReadOnly;
+    final readOnly = isReadOnly;
+    final rawValue = value;
 
-    // Current value
-    final val = value as String?;
-    String display = 'تاریخ را انتخاب کنید';
+    // Convert backend → local datetime
+    final dt = DateTimeConverter.fromBackend(rawValue);
+
     Jalali? selectedJalali;
+    String display = "تاریخ را انتخاب کنید";
 
-    if (val != null && val.isNotEmpty) {
-      try {
-        final dt = DateTime.parse(val);
-        selectedJalali = Jalali.fromDateTime(dt);
-        display = selectedJalali.formatFullDate();
-      } catch (_) {}
+    if (dt != null) {
+      selectedJalali = Jalali.fromDateTime(dt);
+      display = selectedJalali.formatFullDate();
     }
 
     return Container(
       margin: const EdgeInsets.only(top: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
-        contentPadding: EdgeInsets.zero,
         title: Text(display, textAlign: TextAlign.right),
         trailing: const Icon(Icons.calendar_month),
-        onTap: ro
+        onTap: readOnly
             ? null
             : () async {
-                final now = selectedJalali ?? Jalali.now();
-                final picked = await showDialog<Jalali>(
-                  context: context,
-                  builder: (_) => JalaliDatePickerDialog(initialDate: now),
-                );
+          final initial = selectedJalali ?? Jalali.now();
 
-                if (picked != null) {
-                  setValue(picked.toDateTime().toIso8601String());
-                }
-              },
+          final picked = await showDialog<Jalali>(
+            context: context,
+            builder: (_) => JalaliDatePickerDialog(initialDate: initial),
+          );
+
+          if (picked != null) {
+            final localDt = picked.toDateTime();
+            final seconds = DateTimeConverter.uiDateToSeconds(localDt);
+            setValue(seconds);
+          }
+        },
       ),
     );
   }
 }
+

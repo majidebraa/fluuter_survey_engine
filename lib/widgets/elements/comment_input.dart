@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import '../base_reactive_widget.dart';
 
 class CommentInputWidget extends ReactiveSurveyWidget {
-  const CommentInputWidget(
-      {super.key, required super.el, required super.engine});
+  const CommentInputWidget({
+    super.key,
+    required super.el,
+    required super.engine
+  });
 
   @override
   State<CommentInputWidget> createState() => _CommentInputWidgetState();
@@ -16,17 +19,23 @@ class _CommentInputWidgetState
 
   @override
   void initState() {
-    super.initState();
+    // Initialize controller BEFORE calling super
     ctrl = TextEditingController(text: value?.toString() ?? '');
+    super.initState();
   }
 
   @override
   void onEngineUpdate() {
-    // Update controller if value changed externally
     final newValue = value?.toString() ?? '';
     if (ctrl.text != newValue) {
       ctrl.text = newValue;
     }
+  }
+
+  @override
+  void dispose() {
+    ctrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -38,12 +47,6 @@ class _CommentInputWidgetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.el.title != null)
-            Text(
-              widget.el.title!,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          const SizedBox(height: 4),
           TextField(
             controller: ctrl,
             maxLines: 4,

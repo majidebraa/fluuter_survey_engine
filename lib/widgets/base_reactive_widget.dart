@@ -22,8 +22,13 @@ abstract class ReactiveSurveyWidgetState<W extends ReactiveSurveyWidget>
   @override
   void initState() {
     super.initState();
+
     widget.engine.addListener(_update);
-    _update();
+
+    // Defer sync until subclass initState finishes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _update();
+    });
   }
 
   @mustCallSuper
@@ -33,26 +38,25 @@ abstract class ReactiveSurveyWidgetState<W extends ReactiveSurveyWidget>
     super.dispose();
   }
 
-  /// Internal listener
   void _update() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+
+    // First update local state (controllers, etc.)
     onEngineUpdate();
+
+    // Then rebuild widget tree
+    setState(() {});
   }
 
   /// Hook for subclasses to react to engine updates
   void onEngineUpdate() {}
 
   bool get isVisible => widget.engine.isVisible(widget.el);
-
   bool get isReadOnly => widget.engine.isReadOnly(widget.el);
-
   dynamic get value => widget.engine.getValue(widget.el.name);
-
   String? get error => widget.engine.errors[widget.el.name];
-
   void setValue(dynamic v) => widget.engine.setValue(widget.el.name, v);
 
-  /// Build content of the widget
   Widget buildContent(BuildContext context);
 
   @override
@@ -72,3 +76,4 @@ abstract class ReactiveSurveyWidgetState<W extends ReactiveSurveyWidget>
     );
   }
 }
+
