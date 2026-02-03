@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_survey_engine/extenssion/jalali_extenstions.dart';
 import 'package:shamsi_date/shamsi_date.dart';
-
+import '../../common/app_colors.dart';
+import '../../common/app_strings.dart';
+import '../../common/custom_text.dart';
 import '../../common/jalali_date_picker_dialog.dart';
 import '../../utils/date_time_converter.dart';
 import '../base_reactive_widget.dart';
@@ -25,45 +27,59 @@ class _PersianDatePickerWidgetState
     final readOnly = isReadOnly;
     final rawValue = value;
 
-    // Convert backend → local datetime
     final dt = DateTimeConverter.fromBackend(rawValue);
 
     Jalali? selectedJalali;
-    String display = "تاریخ را انتخاب کنید";
+    String display = AppStrings.selectTime;
 
     if (dt != null) {
       selectedJalali = Jalali.fromDateTime(dt);
       display = selectedJalali.formatFullDate();
     }
 
+    // === READONLY COLORS ===
+    final bool ro = isReadOnly;
+    final Color borderColor = ro
+        ? AppColors.greyReadOnlyColor
+        : AppColors.primaryColor;
+    final Color bgColor = ro
+        ? AppColors.greyReadOnlyColor
+        : AppColors.whiteColor;
+    final Color textColor = ro ? AppColors.greyColor : AppColors.blackColor;
+    final Color iconColor = ro ? Colors.grey : AppColors.primaryColor;
+
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
+        color: bgColor,
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
-        title: Text(display, textAlign: TextAlign.right),
-        trailing: const Icon(Icons.calendar_month),
+        title: CustomText(
+          text: display,
+          textAlign: TextAlign.right,
+          color: textColor,
+        ),
+        trailing: Icon(Icons.calendar_month, color: iconColor),
         onTap: readOnly
             ? null
             : () async {
-          final initial = selectedJalali ?? Jalali.now();
+                final initial = selectedJalali ?? Jalali.now();
 
-          final picked = await showDialog<Jalali>(
-            context: context,
-            builder: (_) => JalaliDatePickerDialog(initialDate: initial),
-          );
+                final picked = await showDialog<Jalali>(
+                  context: context,
+                  builder: (_) => JalaliDatePickerDialog(initialDate: initial),
+                );
 
-          if (picked != null) {
-            final localDt = picked.toDateTime();
-            final seconds = DateTimeConverter.uiDateToSeconds(localDt);
-            setValue(seconds);
-          }
-        },
+                if (picked != null) {
+                  final localDt = picked.toDateTime();
+                  final seconds = DateTimeConverter.uiDateToSeconds(localDt);
+                  setValue(seconds);
+                }
+              },
       ),
     );
   }
 }
-

@@ -8,72 +8,90 @@ abstract class ReactiveSurveyWidget extends StatefulWidget {
   final FormElement el;
   final SurveyEngine engine;
 
-  const ReactiveSurveyWidget({
-    Key? key,
-    required this.el,
-    required this.engine,
-  }) : super(key: key);
+  const ReactiveSurveyWidget({Key? key, required this.el, required this.engine})
+    : super(key: key);
 }
 
 /// Base state for ReactiveSurveyWidget
 abstract class ReactiveSurveyWidgetState<W extends ReactiveSurveyWidget>
     extends State<W> {
-  @mustCallSuper
+  bool _pendingRebuild = false;
+
   @override
   void initState() {
     super.initState();
 
-    widget.engine.addListener(_update);
+    widget.engine.addListener(_onEngineChange);
 
-    // Defer sync until subclass initState finishes
+    // sync initial engine state after build
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _update();
+      if (mounted) _scheduleRebuild();
     });
   }
 
-  @mustCallSuper
   @override
   void dispose() {
-    widget.engine.removeListener(_update);
+    widget.engine.removeListener(_onEngineChange);
     super.dispose();
   }
 
-  void _update() {
+  // -----------------------------
+  //  ENGINE → WIDGET UPDATE PIPE
+  // -----------------------------
+  void _onEngineChange() {
     if (!mounted) return;
 
-    // First update local state (controllers, etc.)
     onEngineUpdate();
-
-    // Then rebuild widget tree
-    setState(() {});
+    _scheduleRebuild();
   }
 
-  /// Hook for subclasses to react to engine updates
+  // batch multiple rebuild requests into ONE per frame
+  void _scheduleRebuild() {
+    if (_pendingRebuild) return;
+    _pendingRebuild = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _pendingRebuild = false;
+        setState(() {});
+      }
+    });
+  }
+
+  /// Subclasses override this only if needed
   void onEngineUpdate() {}
 
   bool get isVisible => widget.engine.isVisible(widget.el);
+
   bool get isReadOnly => widget.engine.isReadOnly(widget.el);
+
   dynamic get value => widget.engine.getValue(widget.el.name);
+
   String? get error => widget.engine.errors[widget.el.name];
+
   void setValue(dynamic v) => widget.engine.setValue(widget.el.name, v);
 
   Widget buildContent(BuildContext context);
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 200),
-      child: ConstrainedBox(
-        constraints: isVisible
-            ? const BoxConstraints()
-            : const BoxConstraints(maxHeight: 0),
-        child: Visibility(
-          visible: isVisible,
-          maintainState: true,
-          child: buildContent(context),
+    return KeyedSubtree(
+      // <-- prevents dropdown losing overlay attach
+      key: ValueKey(widget.el.name),
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 200),
+        child: ConstrainedBox(
+          constraints: isVisible
+              ? const BoxConstraints()
+              : const BoxConstraints(maxHeight: 0),
+          child: Visibility(
+            visible: isVisible,
+            maintainState: true,
+            maintainAnimation: true,
+            child: buildContent(context),
+          ),
         ),
       ),
     );
   }
 }
-

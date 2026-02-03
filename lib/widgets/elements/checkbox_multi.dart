@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import '../base_reactive_widget.dart';
 
 class CheckboxMultiWidget extends ReactiveSurveyWidget {
-  const CheckboxMultiWidget(
-      {super.key, required super.el, required super.engine});
+  const CheckboxMultiWidget({
+    super.key,
+    required super.el,
+    required super.engine,
+  });
 
   @override
   State<CheckboxMultiWidget> createState() => _CheckboxMultiWidgetState();
@@ -36,10 +39,11 @@ class _CheckboxMultiWidgetState
                 ? null
                 : (v) {
                     final list = List<dynamic>.from(current);
-                    if (v == true)
+                    if (v == true) {
                       list.add(c);
-                    else
+                    } else {
                       list.remove(c);
+                    }
                     setValue(list);
                   },
           ),

@@ -20,7 +20,9 @@ class AppColors {
   static var blueShade50Color = Colors.blue.shade50;
   static var blueShade100Color = Colors.blue.shade100;
   static var grey200Color = Colors.grey[200];
+  static const greyReadOnlyColor = Color(0xFFF4F4F4);
   static const greyLight2Color = Color(0xFFEEEFF1);
+  static const greyLightPanelColor = Color(0xFFF9F9FA);
   static const grey = Color(0xFFE0E0E0);
   static var greyShadeColor = Colors.grey.shade300;
   static var grey400Color = Colors.grey[400];

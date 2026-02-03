@@ -272,5 +272,5 @@ class AppStrings {
   static const writeYourMessage = 'پیام خود را بنویسید...';
   static const copy = "کپی";
   static const retrySend = "ارسال مجدد";
-
+  static const selectTime = "تاریخ را انتخاب کنید";
 }

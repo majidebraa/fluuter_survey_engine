@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../common/app_colors.dart';
 import '../base_reactive_widget.dart';
 
 class CommentInputWidget extends ReactiveSurveyWidget {
   const CommentInputWidget({
     super.key,
     required super.el,
-    required super.engine
+    required super.engine,
   });
 
   @override
@@ -54,8 +55,20 @@ class _CommentInputWidgetState
             decoration: InputDecoration(
               errorText: error,
               border: const OutlineInputBorder(),
+              filled: true,
+              fillColor: isReadOnly
+                  ? AppColors.greyReadOnlyColor
+                  : Colors.white,
+
+              // Optional: reduce text contrast for read-only
+              disabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: AppColors.greyReadOnlyColor),
+              ),
             ),
             onChanged: setValue,
+            style: TextStyle(
+              color: isReadOnly ? AppColors.greyColor : AppColors.blackColor,
+            ),
           ),
         ],
       ),

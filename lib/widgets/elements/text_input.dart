@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../common/app_colors.dart';
 import '../base_reactive_widget.dart';
 
 class TextInputWidget extends ReactiveSurveyWidget {
@@ -47,6 +47,18 @@ class _TextInputWidgetState extends ReactiveSurveyWidgetState<TextInputWidget> {
         decoration: InputDecoration(
           errorText: error,
           border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: isReadOnly
+              ? AppColors.greyReadOnlyColor
+              : AppColors.whiteColor,
+
+          // Optional: reduce text contrast for read-only
+          disabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.greyReadOnlyColor),
+          ),
+        ),
+        style: TextStyle(
+          color: isReadOnly ? AppColors.greyColor : AppColors.blackColor,
         ),
         onChanged: setValue,
       ),

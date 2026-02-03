@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../common/app_colors.dart';
+import '../../common/custom_text.dart';
+
+
 class PanelCard extends StatefulWidget {
   final String? title;
   final List<Widget> children;
 
-  const PanelCard({
-    Key? key,
-    this.title,
-    required this.children,
-  }) : super(key: key);
+  const PanelCard({super.key, this.title, required this.children});
 
   @override
   State<PanelCard> createState() => _PanelCardState();
@@ -21,10 +21,9 @@ class _PanelCardState extends State<PanelCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      color: AppColors.whiteColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Column(
         children: [
           // 🔹 HEADER
@@ -36,18 +35,21 @@ class _PanelCardState extends State<PanelCard> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      widget.title ?? '',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: CustomText(
+                      text: widget.title ?? '',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
+                      textAlign: TextAlign.right,
                     ),
                   ),
                   AnimatedRotation(
                     turns: _collapsed ? 0.0 : 0.5,
                     duration: const Duration(milliseconds: 200),
-                    child: const Icon(Icons.expand_more),
+                    child: const Icon(
+                      Icons.expand_more,
+                      color: AppColors.primaryColor,
+                    ),
                   ),
                 ],
               ),

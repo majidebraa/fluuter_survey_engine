@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_survey_engine/widgets/elements/expression.dart';
-import 'package:flutter_survey_engine/widgets/elements/question_title.dart';
-import 'package:flutter_survey_engine/widgets/elements/time_picker.dart';
-
+import '../common/app_colors.dart';
+import '../common/custom_button.dart';
+import '../common/custom_text.dart';
 import '../engine/survey_engine.dart';
 import '../models/form_models.dart';
 import 'elements/boolean_toggle.dart';
 import 'elements/checkbox_multi.dart';
 import 'elements/comment_input.dart';
 import 'elements/dropdown.dart';
+import 'elements/expression.dart';
 import 'elements/matrix.dart';
 import 'elements/matrix_dynamic.dart';
 import 'elements/panel_card.dart';
 import 'elements/persian_date_picker.dart';
+import 'elements/question_title.dart';
 import 'elements/radio_group.dart';
 import 'elements/signature_pad.dart';
 import 'elements/text_input.dart';
+import 'elements/time_picker.dart';
 
 class SurveyRenderer extends StatefulWidget {
   final TaskFormDataDto dto;
@@ -31,13 +33,13 @@ class SurveyRenderer extends StatefulWidget {
   final TextDirection textDirection;
 
   const SurveyRenderer({
-    Key? key,
+    super.key,
     required this.dto,
     required this.engine,
     this.onChange,
     this.onOutcome,
     this.textDirection = TextDirection.rtl,
-  }) : super(key: key);
+  });
 
   @override
   State<SurveyRenderer> createState() => _SurveyRendererState();
@@ -64,19 +66,31 @@ class _SurveyRendererState extends State<SurveyRenderer> {
         animation: widget.engine,
         builder: (context, _) {
           return ListView(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 0),
             children: [
+              CustomText(
+                text: widget.dto.formSchema.title,
+                textAlign: TextAlign.right,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                padding: EdgeInsets.all(12),
+              ),
               // Render pages and their elements
               for (final page in widget.dto.formSchema.pages)
                 Card(
-                  margin: const EdgeInsets.all(12),
+                  color: AppColors.greyLightPanelColor,
+                  elevation: 0,
+                  margin: const EdgeInsets.all(0),
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(page.name,
-                            style: Theme.of(context).textTheme.titleLarge),
+                        CustomText(
+                          text: page.name,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                         const SizedBox(height: 8),
                         for (final el in page.elements) _buildElement(el),
                       ],
@@ -84,8 +98,8 @@ class _SurveyRendererState extends State<SurveyRenderer> {
                   ),
                 ),
 
-              // ✅ Render outcome/action buttons
-              _actionButtons(context),
+              //  Render outcome/action buttons
+              if (!widget.dto.readOnly) _actionButtons(context),
             ],
           );
         },
@@ -122,7 +136,7 @@ class _SurveyRendererState extends State<SurveyRenderer> {
       'REJECT': 'رد',
       'APPROVE': 'موافقت',
       'DEFER': 'به تعویق انداختن',
-      'SendToExport': 'ارسال به خروجی',
+      'SendToExpert': 'ارسال به کارشناس',
     };
 
     return Padding(
@@ -135,12 +149,14 @@ class _SurveyRendererState extends State<SurveyRenderer> {
           final icon = outcomeIcons[action] ?? Icons.check;
           final text = outcomeTexts[action] ?? action;
 
-          return ElevatedButton.icon(
-            onPressed: () async {
+          return CustomButton(
+            onClick: () async {
               final ok = await widget.engine.trySubmit();
               if (!ok) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('لطفاً فیلدهای اجباری را تکمیل کنید')),
+                  const SnackBar(
+                    content: Text('لطفاً فیلدهای اجباری را تکمیل کنید'),
+                  ),
                 );
                 return;
               }
@@ -148,12 +164,14 @@ class _SurveyRendererState extends State<SurveyRenderer> {
               // Return selected outcome + form data
               widget.onOutcome?.call(action, widget.engine.values);
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('$text انجام شد')),
-              );
+              /*ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('$text انجام شد')));*/
             },
-            icon: Icon(icon),
-            label: Text(text),
+            icon: Icon(icon).icon,
+            text: text,
+            width: text.split("").length == 3 ? 250 : 150,
+            height: 50,
           );
         }).toList(),
       ),
@@ -161,14 +179,12 @@ class _SurveyRendererState extends State<SurveyRenderer> {
   }
 
   // ---------------- ELEMENT RENDERER ----------------
-  Widget _buildElement(FormElement el, {int level = 0}) {
+  Widget _buildElement(FormElement el /*, {int level = 0}*/) {
     // Panel (recursive)
     if (el.type == 'panel') {
       return PanelCard(
         title: el.title ?? el.name,
-        children: [
-          for (final child in el.elements ?? []) _buildElement(child),
-        ],
+        children: [for (final child in el.elements ?? []) _buildElement(child)],
       );
     }
 

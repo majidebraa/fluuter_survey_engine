@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../common/app_colors.dart';
 import '../../engine/survey_engine.dart';
 import '../../models/form_models.dart';
 
@@ -8,7 +8,7 @@ class Expression extends StatefulWidget {
   final SurveyEngine engine;
 
   const Expression({Key? key, required this.el, required this.engine})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<Expression> createState() => _ExpressionState();
@@ -86,13 +86,13 @@ class _ExpressionState extends State<Expression> {
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
+        border: Border.all(color: AppColors.primaryColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(displayValue, textAlign: TextAlign.right),
-        trailing: const Icon(Icons.calculate, color: Colors.blueGrey),
+        trailing: const Icon(Icons.calculate, color: AppColors.primaryColor),
       ),
     );
   }
