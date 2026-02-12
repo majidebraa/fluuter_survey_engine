@@ -72,12 +72,11 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "50%",
                     "title": "FULL_NAME",
                     "isBinding": true,
-                    "isRequired": true,
                     "questionId": "a1788b94-0e3f-4e66-ad6b-21fdd078feb5",
                     "dataBinding": {
                       "title": "نام و نام خانوادگی",
                       "value": "\${CURRENT_USER.FULL_NAME}",
-                      "type": "ENGINE_VARIABLE",
+                      "type": "ENGINE_VARIABLE"
                     },
                     "dataSourceMapping": [
                       {
@@ -90,12 +89,149 @@ class _SurveyScreenState extends State<SurveyScreen> {
                             "questionName": "FULL_NAME",
                             "responseKey":
                                 "{\"text\":\"response[i].BUYER_FULL_NAME\",\"value\":\"response[i].BUYER_EMPLOYEE_NUMBER\"}",
-                            "type": "questionName",
-                          },
-                        ],
+                            "type": "questionName"
+                          }
+                        ]
                       },
+                      {
+                        "id": "64b6f748-bf5b-4f79-9691-f670ab5d392b",
+                        "event": "onChange",
+                        "dataSourceId": "b08a0a80-e22e-4cd5-bceb-8b4ede48ab73",
+                        "dataMapping": [
+                          {
+                            "id": 1,
+                            "questionName": "CAUSE",
+                            "responseKey": "response[0].PO_NUMBER",
+                            "type": "questionName"
+                          }
+                        ]
+                      }
                     ],
-                    "choices": ["Item 1", "Item 2", "Item 3"],
+                    "choices": ["Item 1", "Item 2", "Item 3"]
+                  },
+                  {
+                    "type": "text",
+                    "name": "txt",
+                    "minWidth": "49%",
+                    "maxWidth": "50%",
+                    "startWithNewLine": false,
+                    "title": "آیتم1",
+                    "isBinding": true,
+                    "questionId": "4d35fe66-e360-4f2f-866a-6373baf1ac09",
+                    "dataBinding": {
+                      "title": "نام و نام خانوادگی",
+                      "value": "\${CURRENT_USER.FULL_NAME}",
+                      "type": "ENGINE_VARIABLE"
+                    },
+                    "dataSourceMapping": [
+                      {
+                        "id": "cd6577c9-adea-48d3-b73c-c4915c3939ee",
+                        "event": "onChange",
+                        "dataSourceId": "b08a0a80-e22e-4cd5-bceb-8b4ede48ab73",
+                        "dataMapping": [
+                          {
+                            "id": 1,
+                            "questionName": "FULL_NAME",
+                            "responseKey":
+                                "{\"text\":\"response[i].BUYER_FULL_NAME\",\"value\":\"response[i].BUYER_EMPLOYEE_NUMBER\"}",
+                            "type": "questionName"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "dropdown",
+                    "name": "testDropDown",
+                    "minWidth": "49%",
+                    "maxWidth": "50%",
+                    "startWithNewLine": false,
+                    "title": "آیتم1",
+                    "isBinding": true,
+                    "questionId": "25124d19-d30e-4b96-8590-8fa689ce3dda",
+                    "dataBinding": {
+                      "title": "نام و نام خانوادگی",
+                      "value": "\${CURRENT_USER.FULL_NAME}",
+                      "type": "ENGINE_VARIABLE"
+                    },
+                    "dataSourceMapping": [
+                      {
+                        "id": "cd6577c9-adea-48d3-b73c-c4915c3939ee",
+                        "event": "onOpened",
+                        "dataSourceId": "b08a0a80-e22e-4cd5-bceb-8b4ede48ab73",
+                        "dataMapping": [
+                          {
+                            "id": 1,
+                            "questionName": "testDropDown",
+                            "responseKey":
+                                "{\"text\":\"response[i].BUYER_FULL_NAME\",\"value\":\"response[i]\"}",
+                            "type": "questionName"
+                          }
+                        ]
+                      }
+                    ],
+                    "choices": ["Item 1", "Item 2", "Item 3"]
+                  },
+                  {
+                    "type": "dropdown",
+                    "name": "testDropDownwithSameTextAndValue",
+                    "minWidth": "49%",
+                    "maxWidth": "50%",
+                    "title": "آیتم1",
+                    "isBinding": true,
+                    "questionId": "4907b9b0-ccbb-464e-ae4a-6968ae49faae",
+                    "dataBinding": {
+                      "title": "نام و نام خانوادگی",
+                      "value": "\${CURRENT_USER.FULL_NAME}",
+                      "type": "ENGINE_VARIABLE"
+                    },
+                    "dataSourceMapping": [
+                      {
+                        "id": "cd6577c9-adea-48d3-b73c-c4915c3939ee",
+                        "event": "onOpened",
+                        "dataSourceId": "b08a0a80-e22e-4cd5-bceb-8b4ede48ab73",
+                        "dataMapping": [
+                          {
+                            "id": 1,
+                            "questionName": "testDropDownwithSameTextAndValue",
+                            "responseKey": "response[i].BUYER_FULL_NAME",
+                            "type": "questionName"
+                          }
+                        ]
+                      }
+                    ],
+                    "choices": ["Item 1", "Item 2", "Item 3"]
+                  },
+                  {
+                    "type": "dropdown",
+                    "name": "drpdownOnload",
+                    "minWidth": "49%",
+                    "maxWidth": "50%",
+                    "startWithNewLine": false,
+                    "title": "آیتم1",
+                    "isBinding": true,
+                    "questionId": "49048627-6380-43c2-b333-63b2c105cc3f",
+                    "dataBinding": {
+                      "title": "نام و نام خانوادگی",
+                      "value": "\${CURRENT_USER.FULL_NAME}",
+                      "type": "ENGINE_VARIABLE"
+                    },
+                    "dataSourceMapping": [
+                      {
+                        "id": "cd6577c9-adea-48d3-b73c-c4915c3939ee",
+                        "event": "onLoad",
+                        "dataSourceId": "b08a0a80-e22e-4cd5-bceb-8b4ede48ab73",
+                        "dataMapping": [
+                          {
+                            "id": 1,
+                            "questionName": "drpdownOnload",
+                            "responseKey": "response[i].BUYER_FULL_NAME",
+                            "type": "questionName"
+                          }
+                        ]
+                      }
+                    ],
+                    "choices": ["Item 1", "Item 2", "Item 3"]
                   },
                   {
                     "type": "text",
@@ -109,7 +245,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "dataBinding": {
                       "title": "کد پرسنلی",
                       "value": "\${CURRENT_USER.PERSONAL_CODE}",
-                      "type": "ENGINE_VARIABLE",
+                      "type": "ENGINE_VARIABLE"
                     },
                     "dataSourceMapping": [
                       {
@@ -121,53 +257,105 @@ class _SurveyScreenState extends State<SurveyScreen> {
                             "id": 1,
                             "questionName": "vendoer",
                             "responseKey": "response[0].VENDOR_NAME",
-                            "type": "questionName",
+                            "type": "questionName"
                           },
                           {
                             "id": 2,
                             "questionName": "bu",
                             "responseKey": "response[0].BU",
-                            "type": "questionName",
+                            "type": "questionName"
                           },
-                        ],
-                      },
-                    ],
+                          {
+                            "id": 3,
+                            "questionName": "RETURN_TIME",
+                            "responseKey": "response[0].BU",
+                            "type": "questionName"
+                          }
+                        ]
+                      }
+                    ]
                   },
                   {
                     "type": "text",
                     "name": "vendoer",
                     "title": "آیتم2",
                     "questionId": "3f9a8713-4c11-48e3-b115-d52ac16090d6",
-                    "visibleIf": "{BUS_NUMBER} > 5",
+                    "dataSourceMapping": [
+                      {
+                        "id": "e1198b3c-5842-42c6-8873-e6934410c0f5",
+                        "event": "onChange",
+                        "dataSourceId": "b08a0a80-e22e-4cd5-bceb-8b4ede48ab73",
+                        "dataMapping": []
+                      }
+                    ]
                   },
                   {
                     "type": "text",
                     "name": "bu",
                     "startWithNewLine": false,
                     "title": "آیتم1",
-                    "questionId": "f33ab69d-6e1e-472f-9237-6972927be9a8",
-                  },
+                    "questionId": "f33ab69d-6e1e-472f-9237-6972927be9a8"
+                  }
+                ]
+              },
+              {
+                "type": "matrixdropdown",
+                "name": "matrixdropdown_",
+                "title": "ماتریس ثابت",
+                "questionId": "2d42a062-7636-4c1c-9b9f-a4b5e4e0d377",
+                "columns": [
+                  {"name": "ستون 1", "cellType": "checkbox"},
+                  {"name": "ستون 2", "cellType": "text"},
+                  {"name": "ستون 3"}
                 ],
+                "choices": [1, 2, 3, 4, 5],
+                "rows": ["سطر 1", "سطر 2"]
+              },
+              {
+                "type": "matrixdynamic",
+                "name": "matrixdynamic",
+                "title": "ماتریس داینامیک",
+                "questionId": "f876e2b2-fbfc-4c05-9fa9-f6941ce12307",
+                "columns": [
+                  {"name": "ستون 1", "cellType": "text"},
+                  {"name": "ستون 2", "cellType": "checkbox"},
+                  {"name": "ستون 3"}
+                ],
+                "choices": [1, 2, 3, 4, 5]
+              },
+              {
+                "type": "matrixdynamic",
+                "name": "martixDynamicApi",
+                "title": "ماتریس با api",
+                "questionId": "616a7fd8-f3f7-40fc-876c-e8986e0222dd",
+                "columns": [
+                  {"name": "VENDOR_NAME", "cellType": "text"},
+                  {"name": "PO_AMOUNT", "cellType": "text"},
+                  {"name": "ستون 3", "cellType": "text"}
+                ],
+                "choices": [1, 2, 3, 4, 5]
               },
               {
                 "type": "panel",
                 "name": "پنل3",
                 "elements": [
                   {
-                    "type": "text",
+                    "type": "radiogroup",
                     "name": "MEMBER_NUMBER",
                     "minWidth": "30%",
                     "maxWidth": "33%",
-                    "title": "تعداد نفر جهت جا به جایی",
-                    "isRequired": true,
+                    "title": "MEMBER_NUMBER",
                     "isBinding": true,
                     "questionId": "36477c48-bdb3-4c6e-8ed1-988a443df26e",
-                    "maskType": "numeric",
-                    "maskSettings": {
-                      "allowNegativeValues": false,
-                      "precision": 0,
-                      "min": 1,
-                    },
+                    "dataSourceMapping": [
+                      {
+                        "id": "d250b8ee-582d-4f40-96bf-5e07378275d5",
+                        "event": "",
+                        "dataSourceId": "",
+                        "dataMapping": []
+                      }
+                    ],
+                    "choices": ["Item 1", "Item 2", "Item 3"]
                   },
                   {
                     "type": "text",
@@ -176,9 +364,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "علت جا به جایی",
-                    "isRequired": true,
                     "isBinding": true,
-                    "questionId": "fb7063ec-031a-4542-870b-cd935e428297",
+                    "questionId": "fb7063ec-031a-4542-870b-cd935e428297"
                   },
                   {
                     "type": "text",
@@ -187,15 +374,14 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "تعداد اتوبوس",
-                    "isRequired": true,
                     "isBinding": true,
                     "questionId": "0bf36849-c3ca-4804-a488-5e2d71ac2177",
                     "maskType": "numeric",
                     "maskSettings": {
                       "allowNegativeValues": false,
                       "precision": 0,
-                      "min": 0,
-                    },
+                      "min": 0
+                    }
                   },
                   {
                     "type": "text",
@@ -203,15 +389,14 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "minWidth": "30%",
                     "maxWidth": "33%",
                     "title": "تعداد مینی بوس",
-                    "isRequired": true,
                     "isBinding": true,
                     "questionId": "dfff24aa-74cd-425f-982e-35ba9afc1cff",
                     "maskType": "numeric",
                     "maskSettings": {
                       "allowNegativeValues": false,
                       "precision": 0,
-                      "min": 0,
-                    },
+                      "min": 0
+                    }
                   },
                   {
                     "type": "text",
@@ -220,9 +405,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "مبدا مسیر",
-                    "isRequired": true,
                     "isBinding": true,
-                    "questionId": "649d7aed-2808-48c7-bd2e-b32acba18899",
+                    "questionId": "649d7aed-2808-48c7-bd2e-b32acba18899"
                   },
                   {
                     "type": "text",
@@ -231,9 +415,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "مقصد مسیر",
-                    "isRequired": true,
                     "isBinding": true,
-                    "questionId": "e0b9fc61-1c72-4868-9d25-ea99911d83d9",
+                    "questionId": "e0b9fc61-1c72-4868-9d25-ea99911d83d9"
                   },
                   {
                     "type": "date-picker",
@@ -241,10 +424,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "minWidth": "30%",
                     "maxWidth": "33%",
                     "title": "DEPARTURE_TIME",
-                    "isRequired": true,
                     "isBinding": true,
                     "questionId": "7a335be5-eb33-4cd6-83bd-4f255ed60ab7",
-                    "dateAndTime": "time",
+                    "dateAndTime": "time"
                   },
                   {
                     "type": "date-picker",
@@ -253,10 +435,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "RETURN_TIME",
-                    "isRequired": true,
                     "isBinding": true,
                     "questionId": "10670cb7-0c17-4c77-a351-ebfeec32b924",
-                    "dateAndTime": "time",
+                    "dateAndTime": "time"
                   },
                   {
                     "type": "text",
@@ -265,11 +446,10 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "مدت ساعت توقف",
-                    "isRequired": true,
                     "isBinding": true,
                     "questionId": "62ea8fa9-af6f-4669-8a45-e8370ccf65fd",
                     "maskType": "numeric",
-                    "maskSettings": {"precision": 0},
+                    "maskSettings": {"precision": 0}
                   },
                   {
                     "type": "text",
@@ -277,15 +457,14 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "minWidth": "30%",
                     "maxWidth": "33%",
                     "title": "تعداد روز توقف",
-                    "isRequired": true,
                     "isBinding": true,
                     "questionId": "35d34afa-d32c-40cd-b62e-734216d4ade3",
                     "maskType": "numeric",
                     "maskSettings": {
                       "allowNegativeValues": false,
                       "precision": 0,
-                      "min": 0,
-                    },
+                      "min": 0
+                    }
                   },
                   {
                     "type": "date-picker",
@@ -294,9 +473,8 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "DEPARTURE_DATE",
-                    "isRequired": true,
                     "isBinding": true,
-                    "questionId": "7f7f8b4a-f909-4a73-8d6d-8beba7376bcd",
+                    "questionId": "7f7f8b4a-f909-4a73-8d6d-8beba7376bcd"
                   },
                   {
                     "type": "date-picker",
@@ -305,16 +483,15 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "maxWidth": "33%",
                     "startWithNewLine": false,
                     "title": "RETURN_DATE",
-                    "isRequired": true,
                     "validators": [
                       {
                         "type": "expression",
                         "text": "تاریخ انتخابی باید بعد از تاریخ رفت باشد",
-                        "expression": "{RETURN_DATE} \n=> \n{DEPARTURE_DATE}",
-                      },
+                        "expression": "{RETURN_DATE} \n=> \n{DEPARTURE_DATE}"
+                      }
                     ],
                     "isBinding": true,
-                    "questionId": "1bb55958-a6fb-4fd6-ad75-973a42fe38ba",
+                    "questionId": "1bb55958-a6fb-4fd6-ad75-973a42fe38ba"
                   },
                   {
                     "type": "text",
@@ -322,10 +499,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "minWidth": "30%",
                     "maxWidth": "33%",
                     "title": "شماره همراه هماهنگ کننده",
-                    "isRequired": true,
                     "questionId": "c977a669-9986-4b3f-84bf-63be52b934d8",
                     "maskType": "pattern",
-                    "maskSettings": {"pattern": "99999999999"},
+                    "maskSettings": {"pattern": "99999999999"}
                   },
                   {
                     "type": "comment",
@@ -333,13 +509,14 @@ class _SurveyScreenState extends State<SurveyScreen> {
                     "startWithNewLine": false,
                     "title": "توضیحات تکمیلی",
                     "readOnly": true,
-                    "questionId": "282becda-4159-4389-8643-194e2f67776d",
-                  },
-                ],
+                    "questionId": "282becda-4159-4389-8643-194e2f67776d"
+                  }
+                ]
               },
               {
                 "type": "expression",
                 "name": "_requestId",
+                "visible": false,
                 "title": "_requestId",
                 "clearIfInvisible": "none",
                 "isPayload": true,
@@ -347,12 +524,13 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 "dataBinding": {
                   "title": "شناسه یکتا",
                   "value": "\${UNIQUE_RANDOM_CODE}",
-                  "type": "ENGINE_VARIABLE",
-                },
+                  "type": "ENGINE_VARIABLE"
+                }
               },
               {
                 "type": "expression",
                 "name": "_requestNumber",
+                "visible": false,
                 "startWithNewLine": false,
                 "title": "_requestNumber",
                 "clearIfInvisible": "none",
@@ -361,10 +539,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 "dataBinding": {
                   "title": "شناسه یکتا",
                   "value": "\${UNIQUE_RANDOM_CODE}",
-                  "type": "ENGINE_VARIABLE",
+                  "type": "ENGINE_VARIABLE"
                 },
-                "expression": "\"test_\"+{RESPONSIBLE_NUMBER}",
-                "visibleIf": "{BUS_NUMBER} < 3",
+                "expression": "\"test_\"+{RESPONSIBLE_NUMBER}"
               },
               {
                 "type": "expression",
@@ -375,12 +552,30 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 "clearIfInvisible": "none",
                 "isPayload": true,
                 "questionId": "47afbc26-88f3-4faf-ab70-11f44bdbc50d",
-                "expression": "test",
-              },
-            ],
-          },
+                "expression": "test"
+              }
+            ]
+          }
         ],
-        "outcomeType": ["SUBMIT", "ACCEPT"],
+        "calculatedValues": [
+          {"name": "lkjkjjkh"}
+        ],
+        "outcomeType": ["SUBMIT"],
+        "surveyDataSourceMapping": [
+          {
+            "id": "15869530-3148-4ac5-8123-95e2e817e8ca",
+            "event": "onLoad",
+            "dataSourceId": "b08a0a80-e22e-4cd5-bceb-8b4ede48ab73",
+            "dataMapping": [
+              {
+                "id": 1,
+                "questionName": "martixDynamicApi",
+                "responseKey": "response[i]",
+                "type": "questionName"
+              }
+            ]
+          }
+        ],
         "dataSources": [
           {
             "title": "users",
@@ -391,23 +586,26 @@ class _SurveyScreenState extends State<SurveyScreen> {
                 "https://em-stage.irisaco.com/dis/api/public/v2.0/proxy?pn=IRISA_PO_CONTRACT_INFO_V&page=0&size=500000",
             "bodyType": "Json",
             "RestApi_Method": "POST",
-            "RestApi_JsonBody":
-                "{\r\n \"filter\": {\r\n \"PO_NUMBER\": \"\${PERSONAL_CODE}\"\r\n }\r\n}",
-          },
-        ],
+            "RestApi_JsonBody": ""
+          }
+        ]
       },
       "formData": {
         "FULL_NAME": "Majid Ebrahimi",
+        "txt": "Majid Ebrahimi",
+        "testDropDown": "Majid Ebrahimi",
+        "testDropDownwithSameTextAndValue": "Majid Ebrahimi",
+        "drpdownOnload": "Majid Ebrahimi",
         "PERSONAL_CODE": "4000595",
-        "_requestId": "140410307826",
-        "_requestNumber": "140410306485",
+        "_requestId": "140411234804",
+        "_requestNumber": "140411232254"
       },
       "isClaimed": true,
       "formMetadata": {
-        "requestDate": 1768918207359,
+        "requestDate": 1770638243692,
         "requestNumber": null,
-        "requester": "مجید ابراهیمی افارانی",
-      },
+        "requester": "مجید ابراهیمی افارانی"
+      }
     });
     engine = SurveyEngine(dto.formSchema, evaluator: DartExpressionEvaluator());
     engine.setInitial(dto.formData);

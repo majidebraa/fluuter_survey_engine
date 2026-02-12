@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+
 import '../../common/app_colors.dart';
 import '../base_reactive_widget.dart';
 
 class TextInputWidget extends ReactiveSurveyWidget {
-  const TextInputWidget({super.key, required super.el, required super.engine});
+  final void Function(dynamic)? onChanged; // <-- ADDED
+
+  const TextInputWidget({
+    super.key,
+    required super.el,
+    required super.engine,
+    this.onChanged,
+  });
 
   @override
   State<TextInputWidget> createState() => _TextInputWidgetState();
@@ -15,8 +23,6 @@ class _TextInputWidgetState extends ReactiveSurveyWidgetState<TextInputWidget> {
   @override
   void initState() {
     super.initState();
-
-    // Initialize controller
     ctrl = TextEditingController(text: value?.toString() ?? '');
   }
 
@@ -28,7 +34,6 @@ class _TextInputWidgetState extends ReactiveSurveyWidgetState<TextInputWidget> {
 
   @override
   void onEngineUpdate() {
-    // Only update if controller is initialized
     if (ctrl == null) return;
 
     final newValue = value?.toString() ?? '';
@@ -40,7 +45,7 @@ class _TextInputWidgetState extends ReactiveSurveyWidgetState<TextInputWidget> {
   @override
   Widget buildContent(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
       child: TextField(
         controller: ctrl,
         readOnly: isReadOnly,
@@ -48,11 +53,8 @@ class _TextInputWidgetState extends ReactiveSurveyWidgetState<TextInputWidget> {
           errorText: error,
           border: const OutlineInputBorder(),
           filled: true,
-          fillColor: isReadOnly
-              ? AppColors.greyReadOnlyColor
-              : AppColors.whiteColor,
-
-          // Optional: reduce text contrast for read-only
+          fillColor:
+              isReadOnly ? AppColors.greyReadOnlyColor : AppColors.whiteColor,
           disabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: AppColors.greyReadOnlyColor),
           ),
@@ -60,7 +62,17 @@ class _TextInputWidgetState extends ReactiveSurveyWidgetState<TextInputWidget> {
         style: TextStyle(
           color: isReadOnly ? AppColors.greyColor : AppColors.blackColor,
         ),
-        onChanged: setValue,
+        onChanged: isReadOnly
+            ? null
+            : (txt) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(txt); // <-- MatrixDropdown update
+                  } else {
+                    setValue(txt); // <-- Normal field update
+                  }
+                });
+              },
       ),
     );
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_survey_engine/widgets/elements/matrix_dropdown.dart';
+
 import '../common/app_colors.dart';
 import '../common/custom_button.dart';
 import '../common/custom_text.dart';
@@ -43,6 +45,46 @@ class SurveyRenderer extends StatefulWidget {
 
   @override
   State<SurveyRenderer> createState() => _SurveyRendererState();
+
+  static Widget buildElementStatic({
+    required BuildContext context,
+    required FormElement el,
+    required SurveyEngine engine,
+    void Function(dynamic)? onChanged,
+  }) {
+    switch (el.type) {
+      case 'text':
+        return TextInputWidget(
+          el: el,
+          engine: engine,
+          onChanged: onChanged,
+        );
+
+      case 'dropdown':
+        return DropdownWidget(
+          el: el,
+          engine: engine,
+          onChanged: onChanged,
+        );
+
+      case 'checkbox':
+        return CheckboxMultiWidget(
+          el: el,
+          engine: engine,
+          onChanged: onChanged,
+        );
+
+      case 'radiogroup':
+        return RadioGroupWidget(
+          el: el,
+          engine: engine,
+          onChanged: onChanged,
+        );
+
+      default:
+        return Text("Unsupported cell: ${el.type}");
+    }
+  }
 }
 
 class _SurveyRendererState extends State<SurveyRenderer> {
@@ -234,7 +276,8 @@ class _SurveyRendererState extends State<SurveyRenderer> {
           }
           return PersianDatePickerWidget(el: el, engine: widget.engine);
         }
-
+      case 'matrixdropdown':
+        return MatrixDropdownWidget(el: el, engine: widget.engine);
       case 'matrix':
         return MatrixWidget(el: el, engine: widget.engine);
 

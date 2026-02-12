@@ -118,7 +118,7 @@ class DataSource {
   factory DataSource.fromJson(Map<String, dynamic> json) => DataSource(
         title: json['title'] ?? '',
         dataSourceId: json['dataSourceId'] ?? '',
-        dataSourceType: json['dataSourceId'] ?? '',
+        dataSourceType: json['dataSourceType'] ?? '',
         restApiHeader: (json['RestApi_Header'] as List<dynamic>? ?? [])
             .map((e) => e.toString())
             .toList(),
@@ -152,27 +152,34 @@ class FormElement {
   final bool? isRequired;
   final String? inputType;
   final String? maskType;
-  final Map<String, dynamic>? maskSettings; // new
+  final Map<String, dynamic>? maskSettings;
   final bool? visible;
   final String? clearIfInvisible;
   final bool? isPayload;
   final String? expression;
   final String? calculatedValue;
   final String? maxWidth;
-  final bool? startWithNewLine; // new
-  final String? dateAndTime; // new
+  final bool? startWithNewLine;
+  final String? dateAndTime;
 
   final DataBinding? dataBinding;
   final List<DataSourceMapping>? dataSourceMapping;
   final List<FormElement>? elements;
-  final List<Validator>? validators; // new
+  final List<Validator>? validators;
 
   List<dynamic>? choices;
   dynamic defaultValue;
   final String? placeholder;
 
-  final List<ColumnSchema>? columns;
-  final List<RowSchema>? rows;
+  // MATRIX SUPPORT
+  final List<ColumnSchema>? columns; // For Matrix & MatrixDynamic
+  final List<RowSchema>? rows; // For Matrix
+  final List<Map<String, dynamic>>?
+      dynamicRows; // For MatrixDynamic initial values
+  final bool? allowAddRows; // For MatrixDynamic
+  final bool? allowRemoveRows; // For MatrixDynamic
+  final int? minRowCount; // For MatrixDynamic
+  final int? maxRowCount; // For MatrixDynamic
 
   FormElement({
     required this.type,
@@ -203,6 +210,11 @@ class FormElement {
     this.placeholder,
     this.columns,
     this.rows,
+    this.dynamicRows,
+    this.allowAddRows,
+    this.allowRemoveRows,
+    this.minRowCount,
+    this.maxRowCount,
   });
 
   factory FormElement.fromJson(Map<String, dynamic> json) => FormElement(
@@ -229,52 +241,43 @@ class FormElement {
         maxWidth: json['maxWidth'],
         startWithNewLine: json['startWithNewLine'],
         dateAndTime: json['dateAndTime'],
-
         dataBinding: json['dataBinding'] != null
             ? DataBinding.fromJson(json['dataBinding'])
             : null,
-
         dataSourceMapping: json['dataSourceMapping'] != null
             ? (json['dataSourceMapping'] as List)
                 .map((e) => DataSourceMapping.fromJson(e))
                 .toList()
             : null,
-
         elements: json['elements'] != null
             ? (json['elements'] as List)
                 .map((e) => FormElement.fromJson(e))
                 .toList()
             : null,
-
         choices: json['choices'],
         validators: json['validators'] != null
             ? (json['validators'] as List)
                 .map((e) => Validator.fromJson(e))
                 .toList()
             : null,
-        // This supports strings and objects
-        columns: _parseColumns(json['columns']),
-        rows: _parseRows(json['rows']),
-
+        columns: json['columns'] != null
+            ? (json['columns'] as List)
+                .map((e) => ColumnSchema.fromJson(e))
+                .toList()
+            : null,
+        rows: json['rows'] != null
+            ? (json['rows'] as List).map((e) => RowSchema.fromJson(e)).toList()
+            : null,
+        dynamicRows: json['dynamicRows'] != null
+            ? List<Map<String, dynamic>>.from(json['dynamicRows'])
+            : null,
+        allowAddRows: json['allowAddRows'],
+        allowRemoveRows: json['allowRemoveRows'],
+        minRowCount: json['minRowCount'],
+        maxRowCount: json['maxRowCount'],
         defaultValue: json['defaultValue'],
         placeholder: json['placeholder'],
       );
-
-  static List<ColumnSchema>? _parseColumns(dynamic data) {
-    if (data == null) return null;
-    return (data as List).map((e) {
-      if (e is String) return ColumnSchema(name: e);
-      return ColumnSchema.fromJson(e);
-    }).toList();
-  }
-
-  static List<RowSchema>? _parseRows(dynamic data) {
-    if (data == null) return null;
-    return (data as List).map((e) {
-      if (e is String) return RowSchema(name: e);
-      return RowSchema.fromJson(e);
-    }).toList();
-  }
 
   Map<String, dynamic> toJson() => {
         'type': type,
@@ -302,6 +305,11 @@ class FormElement {
         'validators': validators?.map((e) => e.toJson()).toList(),
         'columns': columns?.map((e) => e.toJson()).toList(),
         'rows': rows?.map((e) => e.toJson()).toList(),
+        'dynamicRows': dynamicRows,
+        'allowAddRows': allowAddRows,
+        'allowRemoveRows': allowRemoveRows,
+        'minRowCount': minRowCount,
+        'maxRowCount': maxRowCount,
         'defaultValue': defaultValue,
         'placeholder': placeholder,
       };
@@ -329,24 +337,100 @@ class Validator {
 
 class ColumnSchema {
   final String name;
+  final String? text;
+  final String? cellType;
+  final List<dynamic>? choices;
+  final dynamic defaultValue;
+  final bool? readOnly;
+  final bool? isRequired;
+  final String? dateAndTime;
 
-  ColumnSchema({required this.name});
+  ColumnSchema({
+    required this.name,
+    this.text,
+    this.cellType,
+    this.choices,
+    this.defaultValue,
+    this.readOnly,
+    this.isRequired,
+    this.dateAndTime,
+  });
 
-  factory ColumnSchema.fromJson(Map<String, dynamic> json) =>
-      ColumnSchema(name: json['name'] ?? '');
+  factory ColumnSchema.fromJson(Map<String, dynamic> json) => ColumnSchema(
+        name: json['name'] ?? '',
+        text: json['text'] ?? '',
+        cellType: json['cellType'],
+        choices: json['choices'],
+        defaultValue: json['defaultValue'],
+        readOnly: json['readOnly'],
+        isRequired: json['isRequired'],
+        dateAndTime: json['dateAndTime'],
+      );
 
-  Map<String, dynamic> toJson() => {'name': name};
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'text': text,
+        'cellType': cellType,
+        'choices': choices,
+        'defaultValue': defaultValue,
+        'readOnly': readOnly,
+        'isRequired': isRequired,
+        'dateAndTime': dateAndTime,
+      };
 }
 
 class RowSchema {
   final String name;
+  final String? text;
+  final String? type;
+  final List<dynamic>? choices;
+  final dynamic defaultValue;
+  final bool? readOnly;
+  final bool? isRequired;
+  final String? dateAndTime;
 
-  RowSchema({required this.name});
+  RowSchema({
+    required this.name,
+    this.text,
+    this.type,
+    this.choices,
+    this.defaultValue,
+    this.readOnly,
+    this.isRequired,
+    this.dateAndTime,
+  });
 
-  factory RowSchema.fromJson(Map<String, dynamic> json) =>
-      RowSchema(name: json['name'] ?? '');
+  factory RowSchema.fromJson(dynamic json) {
+    if (json is String) {
+      return RowSchema(name: json, text: json); // backwards compatibility
+    }
 
-  Map<String, dynamic> toJson() => {'name': name};
+    return RowSchema(
+      name: json['name'],
+      text: json['text'] ?? json['name'],
+      type: json['type'],
+      choices: json['choices'],
+      defaultValue: json['defaultValue'],
+      readOnly: json['readOnly'],
+      isRequired: json['isRequired'],
+      dateAndTime: json['dateAndTime'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'type': type,
+        'text': text,
+        'choices': choices,
+        'defaultValue': defaultValue,
+        'readOnly': readOnly,
+        'isRequired': isRequired,
+        'dateAndTime': dateAndTime,
+      };
+
+  factory RowSchema.fromSimple(String text) {
+    return RowSchema(name: text, text: text);
+  }
 }
 
 class DataSourceMapping {

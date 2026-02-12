@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import '../base_reactive_widget.dart';
 
 class CheckboxMultiWidget extends ReactiveSurveyWidget {
+  final void Function(List<dynamic>)? onChanged;
+
   const CheckboxMultiWidget({
     super.key,
     required super.el,
     required super.engine,
+    this.onChanged,
   });
 
   @override
@@ -17,7 +20,6 @@ class _CheckboxMultiWidgetState
     extends ReactiveSurveyWidgetState<CheckboxMultiWidget> {
   @override
   void onEngineUpdate() {
-    // No extra state needed, just rebuild
     if (mounted) setState(() {});
   }
 
@@ -28,31 +30,41 @@ class _CheckboxMultiWidgetState
     final choices = widget.el.choices ?? [];
     final current = (value as List<dynamic>?) ?? [];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final c in choices)
-          CheckboxListTile(
-            title: Text(c.toString()),
-            value: current.contains(c),
-            onChanged: isReadOnly
-                ? null
-                : (v) {
-                    final list = List<dynamic>.from(current);
-                    if (v == true) {
-                      list.add(c);
-                    } else {
-                      list.remove(c);
-                    }
-                    setValue(list);
-                  },
-          ),
-        if (error != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Text(error!, style: const TextStyle(color: Colors.red)),
-          ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        children: choices.map((c) {
+          final checked = current.contains(c);
+
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: checked,
+                onChanged: isReadOnly
+                    ? null
+                    : (v) {
+                        final list = List<dynamic>.from(current);
+                        if (v == true) {
+                          list.add(c);
+                        } else {
+                          list.remove(c);
+                        }
+
+                        // Update value in reactive engine
+                        setValue(list);
+
+                        // Call callback if provided
+                        widget.onChanged?.call(list);
+                      },
+              ),
+              Text(c.toString()),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 }

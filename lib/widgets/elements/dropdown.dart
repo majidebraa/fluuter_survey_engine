@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+
 import '../../common/app_colors.dart';
 import '../../common/app_strings.dart';
 import '../base_reactive_widget.dart';
 
 class DropdownWidget extends ReactiveSurveyWidget {
-  const DropdownWidget({super.key, required super.el, required super.engine});
+  final void Function(dynamic)? onChanged; // <-- ADDED
+
+  const DropdownWidget({
+    super.key,
+    required super.el,
+    required super.engine,
+    this.onChanged, // <-- ADDED
+  });
 
   @override
   State<DropdownWidget> createState() => _DropdownWidgetState();
@@ -22,9 +30,8 @@ class _DropdownWidgetState extends ReactiveSurveyWidgetState<DropdownWidget> {
 
     final ro = isReadOnly;
 
-    final borderColor = ro
-        ? AppColors.greyReadOnlyColor
-        : AppColors.primaryColor;
+    final borderColor =
+        ro ? AppColors.greyReadOnlyColor : AppColors.primaryColor;
 
     final bgColor = ro ? AppColors.greyColor : AppColors.whiteColor;
 
@@ -33,7 +40,7 @@ class _DropdownWidgetState extends ReactiveSurveyWidgetState<DropdownWidget> {
     final iconColor = ro ? Colors.grey : AppColors.primaryColor;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,16 +55,12 @@ class _DropdownWidgetState extends ReactiveSurveyWidgetState<DropdownWidget> {
               child: DropdownButton<dynamic>(
                 isExpanded: true,
                 menuMaxHeight: 300,
-
                 value: safeValue,
-
                 icon: Icon(Icons.arrow_drop_down, color: iconColor),
-
                 hint: Text(
                   AppStrings.select,
                   style: TextStyle(color: textColor),
                 ),
-
                 items: choices.map((c) {
                   return DropdownMenuItem(
                     value: c,
@@ -67,19 +70,22 @@ class _DropdownWidgetState extends ReactiveSurveyWidgetState<DropdownWidget> {
                     ),
                   );
                 }).toList(),
-
                 onChanged: ro
                     ? null
                     : (v) {
                         // Prevent dropdown overlay glitch
                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                          setValue(v);
+                          if (widget.onChanged != null) {
+                            widget.onChanged!(
+                                v); // <-- NEW: matrix handles update
+                          } else {
+                            setValue(v); // <-- normal dropdown
+                          }
                         });
                       },
               ),
             ),
           ),
-
           if (error != null)
             Padding(
               padding: const EdgeInsets.only(top: 4),
